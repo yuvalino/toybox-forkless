@@ -81,6 +81,10 @@
 #include "generated/globals.h"
 #include "generated/tags.h"
 
+#if TOYBOX_FORKLESS
+#include "tvm.h"
+#endif
+
 // These live in main.c
 
 #define HELP_USAGE   1  // usage: line only
@@ -107,6 +111,28 @@ extern struct toy_list {
 
 // Global context shared by all commands.
 
+#if TOYBOX_FORKLESS
+struct toy_context {
+  struct toy_list *which;  // Which entry in toy_list is this one?
+  char **argv;             // Original command line arguments
+  char **optargs;          // Arguments left over from get_optflags()
+  unsigned long long optflags; // Command line option flags from get_optflags()
+  int optc;                // Count of optargs
+  short toycount;          // Total number of commands in this build
+  char exitval;            // Value error_exit feeds to exit()
+  char wasroot;            // dropped setuid
+
+  // toy_init() should not zero past here.
+  sigjmp_buf *rebound;     // siglongjmp here instead of exit when do_rebound
+  struct arg_list *xexit;  // atexit() functions for xexit(), set by sigatexit()
+  void *stacktop;          // nested toy_exec() call count, or 0 if vforked
+  int envc;                // Count of original environ entries
+  int old_umask;           // Old umask preserved by TOYFLAG_UMASK
+  short signal;            // generic_signal() records what signal it saw here
+  int signalfd;            // and writes signal to this fd, if set
+};
+COW_DECL(struct toy_context toys);
+#else
 extern struct toy_context {
   struct toy_list *which;  // Which entry in toy_list is this one?
   char **argv;             // Original command line arguments
@@ -126,10 +152,18 @@ extern struct toy_context {
   short signal;            // generic_signal() records what signal it saw here
   int signalfd;            // and writes signal to this fd, if set
 } toys;
+#endif
 
 // Two big temporary buffers: one for use by commands, one for library functions
 
+#if TOYBOX_FORKLESS
+extern char **environ;
+COW_DECL(char *toybox_version);
+COW_DECL(char toybuf[4096]);
+COW_DECL(char libbuf[4096]);
+#else
 extern char **environ, *toybox_version, toybuf[4096], libbuf[4096];
+#endif
 
 #define FLAG(x) (!!(toys.optflags&FLAG_##x))  // Return 1 if flag set, 0 if not
 

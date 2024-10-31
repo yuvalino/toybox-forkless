@@ -53,7 +53,11 @@ int read_password(char *buf, int buflen, char *mesg)
 {
   struct termios oldtermio;
   struct sigaction sa = {.sa_handler = generic_signal}, oldsa;
+#if TOYBOX_FORKLESS
+  int i, tty = _tty_fd(), ret = 1;
+#else
   int i, tty = tty_fd(), ret = 1;
+#endif
 
   // Set NOP signal handler to return from the read.
   fflush(0);

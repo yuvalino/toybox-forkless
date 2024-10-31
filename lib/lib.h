@@ -315,7 +315,11 @@ int draw_trim_esc(char *str, int padto, int width, char *escmore,
 int draw_trim(char *str, int padto, int width);
 
 // tty.c
+#if TOYBOX_FORKLESS
+int _tty_fd(void);
+#else
 int tty_fd(void);
+#endif
 int terminal_size(unsigned *xx, unsigned *yy);
 int terminal_probesize(unsigned *xx, unsigned *yy);
 #define KEY_UP 0

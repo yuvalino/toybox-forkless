@@ -37,7 +37,11 @@ static void login_timeout_handler(int sig __attribute__((unused)))
 
 void login_main(void)
 {
+#if TOYBOX_FORKLESS
+  int count, tty = _tty_fd();
+#else
   int count, tty = tty_fd();
+#endif
   char *username, *pass = 0, *ss;
   struct passwd *pwd = 0;
 

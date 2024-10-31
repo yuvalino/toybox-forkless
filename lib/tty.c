@@ -17,7 +17,11 @@
 #include "toys.h"
 
 // Check stdout, stderr, stdin (in that order) and if none open /dev/tty
+#if TOYBOX_FORKLESS
+int _tty_fd(void)
+#else
 int tty_fd(void)
+#endif
 {
   int i, j;
 

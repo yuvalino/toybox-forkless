@@ -5,6 +5,10 @@
 
 #include "toys.h"
 
+#if TOYBOX_FORKLESS
+#include "tvm.h"
+#endif
+
 // Populate toy_list[].
 
 #undef NEWTOY
@@ -16,12 +20,20 @@
 struct toy_list toy_list[] = {
 #include "generated/newtoys.h"
 };
-
+#if TOYBOX_FORKLESS
 // global context for this command.
 
+COW_IMPL(struct toy_context, toys);
+union global_union this;
+COW_IMPL_INIT(char *, toybox_version, TOYBOX_VERSION);
+COW_IMPL(char[4096], toybuf);
+COW_IMPL(char[4096], libbuf);
+#else
+// global context for this command.
 struct toy_context toys;
 union global_union this;
 char *toybox_version = TOYBOX_VERSION, toybuf[4096], libbuf[4096];
+#endif
 
 struct toy_list *toy_find(char *name)
 {
@@ -301,7 +313,11 @@ void toybox_main(void)
   xputc('\n');
 }
 
+#if TOYBOX_FORKLESS
+int _toybox_main(int argc, char *argv[])
+#else
 int main(int argc, char *argv[])
+#endif
 {
   // don't segfault if our environment is crazy
   // TODO mooted by kernel commit dcd46d897adb7 5.17 kernel Jan 2022

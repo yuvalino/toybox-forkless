@@ -1322,7 +1322,11 @@ static void common_setup(void)
 
   TT.ticks = sysconf(_SC_CLK_TCK); // units for starttime/uptime
 
+#if TOYBOX_FORKLESS
+  if (-1 != (i = _tty_fd())) {
+#else
   if (-1 != (i = tty_fd())) {
+#endif
     struct stat st;
 
     if (!fstat(i, &st)) TT.tty = st.st_rdev;

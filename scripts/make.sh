@@ -290,7 +290,8 @@ done
 [ $DONE -ne 0 ] && exit 1
 
 UNSTRIPPED="$UNSTRIPPED/${OUTNAME/*\//}"
-do_loudly $BUILD $LNKFILES $LINK -o "$UNSTRIPPED" || exit 1
+#do_loudly $BUILD $LNKFILES $LINK -o "$UNSTRIPPED" || exit 1
+do_loudly echo $BUILD $LNKFILES $LINK > "$UNSTRIPPED" || exit 1
 if [ -n "$NOSTRIP" ] ||
   ! do_loudly ${CROSS_COMPILE}${STRIP} "$UNSTRIPPED" -o "$OUTNAME"
 then
