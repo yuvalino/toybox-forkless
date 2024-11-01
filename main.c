@@ -314,6 +314,15 @@ void toybox_main(void)
 }
 
 #if TOYBOX_FORKLESS
+
+void toybox_iter_toy_names(void (*fn)(const char *, void *), void * arg)
+{
+  int i;
+  for (i = 1; i<ARRAY_LEN(toy_list); i++) {
+    fn(toy_list[i].name, arg);
+  }
+}
+
 int _toybox_main(int argc, char *argv[])
 #else
 int main(int argc, char *argv[])
