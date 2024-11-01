@@ -206,7 +206,7 @@ fi
   -e '/^GLOBALS(/,/^)/{s/^GLOBALS(//;T s2;g;s/.*/struct &_data {/;:s2;s/^)/};\n/;p}' \
   $TOYFILES)"
   echo "$STRUX" &&
-  echo "extern union global_union {" &&
+  echo "extern __thread union global_union {" &&
   $SED -n 's/^struct \(.*\)_data .*/\1/;T;s/.*/\tstruct &_data &;/p' \
     <<<"$STRUX" &&
   echo "} this;"

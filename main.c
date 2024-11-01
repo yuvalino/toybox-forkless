@@ -24,7 +24,7 @@ struct toy_list toy_list[] = {
 // global context for this command.
 
 COW_IMPL(struct toy_context, toys);
-union global_union this;
+COW_IMPL(union global_union, this);
 COW_IMPL_INIT(char *, toybox_version, TOYBOX_VERSION);
 COW_IMPL(char[4096], toybuf);
 COW_IMPL(char[4096], libbuf);
