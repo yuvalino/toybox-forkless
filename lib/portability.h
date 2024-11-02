@@ -6,7 +6,9 @@
 
 // Always use long file support.
 // This must come before we #include any system header file to take effect!
+#if !TOYBOX_FORKLESS
 #define _FILE_OFFSET_BITS 64
+#endif
 
 #ifdef __APPLE__
 // macOS 10.13 doesn't have the POSIX 2008 direct access to timespec in
