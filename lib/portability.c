@@ -585,7 +585,8 @@ char *fs_type_name(struct statfs *statfs)
 }
 
 #if defined(__APPLE__)
-#include <sys/disk.h>
+#define DKIOCGETBLOCKSIZE                     _IOR('d', 24, uint32_t)
+#define DKIOCGETBLOCKCOUNT                    _IOR('d', 25, uint64_t)
 int get_block_device_size(int fd, unsigned long long* size)
 {
   unsigned long block_size, block_count;
