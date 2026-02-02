@@ -32,6 +32,14 @@ GLOBALS(
   char *e;
 )
 
+#if TOYBOX_FORKLESS
+#include "tvm.h"
+#define ENVIRON tvm_environ
+#else
+extern char **environ;
+#define ENVIRON environ
+#endif
+
 void env_main(void)
 {
   char **ev = toys.optargs, **ee = 0, **set QUIET, *path = getenv("PATH");
@@ -59,12 +67,12 @@ void env_main(void)
       if (!strchr(ex, '/') && path) {
          errno = ENOENT;
          for (sl = find_in_path(path, ex); sl; sl = sl->next)
-           execve(sl->str, ev, ee ? : environ);
-      } else execve(ex, ev, ee ? : environ);
+           execve(sl->str, ev, ee ? : ENVIRON);
+      } else execve(ex, ev, ee ? : ENVIRON);
       perror_msg("exec %s", ex);
       _exit(126+(errno == ENOENT));
     }
   }
 
-  for (ev = ee ? : environ; *ev; ev++) xprintf("%s%c", *ev, '\n'*!FLAG(0));
+  for (ev = ee ? : ENVIRON; *ev; ev++) xprintf("%s%c", *ev, '\n'*!FLAG(0));
 }

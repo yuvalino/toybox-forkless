@@ -17,6 +17,14 @@ config PRINTENV
 
 #include "toys.h"
 
+#if TOYBOX_FORKLESS
+#include "tvm.h"
+#define ENVIRON tvm_environ
+#else
+extern char **environ;
+#define ENVIRON environ
+#endif
+
 void printenv_main(void)
 {
   char **env, **var = toys.optargs;
@@ -27,7 +35,7 @@ void printenv_main(void)
   do {
     int catch = 0, len = *var ? strlen(*var) : 0;
 
-    for (env = environ; *env; env++) {
+    for (env = ENVIRON; *env; env++) {
       char *out = *env;
       if (*var) {
         if (!strncmp(out, *var, len) && out[len] == '=') out += len +1;
