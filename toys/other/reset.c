@@ -21,11 +21,7 @@ config RESET
 
 void reset_main(void)
 {
-#if TOYBOX_FORKLESS
-  int fd = _tty_fd();
-#else
   int fd = tty_fd();
-#endif
 
   // man 4 console_codes: reset terminal is ESC (no left bracket) c
   // DEC private mode set enable wraparound sequence.

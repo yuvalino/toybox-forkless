@@ -32,13 +32,8 @@ GLOBALS(
   char *e;
 )
 
-#if TOYBOX_FORKLESS
-#include "tvm.h"
-#define ENVIRON tvm_environ
-#else
 extern char **environ;
 #define ENVIRON environ
-#endif
 
 void env_main(void)
 {

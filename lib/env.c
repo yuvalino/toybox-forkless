@@ -3,13 +3,8 @@
 #include "toys.h"
 
 // In libc, populated by start code, used by getenv() and exec() and friends.
-#if TOYBOX_FORKLESS
-#include "tvm.h"
-#define ENVIRON tvm_environ
-#else
 extern char **environ;
 #define ENVIRON environ
-#endif
 
 
 // Returns the number of bytes taken by the environment variables. For use

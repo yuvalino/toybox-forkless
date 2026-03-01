@@ -3,7 +3,6 @@
  * Copyright 2006 Rob Landley <rob@landley.net>
  */
 
-#include "tvm.h"
 #define SYSLOG_NAMES
 #include "toys.h"
 
@@ -792,7 +791,7 @@ int wfchmodat(int fd, char *name, mode_t mode)
   return rc;
 }
 
-static COW_IMPL(char *, tempfile2zap);
+static char *tempfile2zap;
 static void tempfile_handler(void)
 {
   if (1 < (long)tempfile2zap) unlink(tempfile2zap);
@@ -1299,7 +1298,7 @@ char *next_printf(char *s, char **start)
   return 0;
 }
 
-static COW_IMPL(struct pwuidbuf_list *, pwuidbuf);
+static struct pwuidbuf_list *pwuidbuf;
 
 // Return cached passwd entries.
 struct passwd *bufgetpwnamuid(char *name, uid_t uid)
@@ -1341,7 +1340,7 @@ struct passwd *bufgetpwuid(uid_t uid)
   return bufgetpwnamuid(0, uid);
 }
 
-static COW_IMPL(struct grgidbuf_list *, grgidbuf);
+static struct grgidbuf_list *grgidbuf;
 
 // Return cached group entries.
 struct group *bufgetgrnamgid(char *name, gid_t gid)
@@ -1411,7 +1410,7 @@ int regexec0(regex_t *preg, char *string, long len, int nmatch,
   return regexec(preg, string, nmatch, pmatch, eflags|REG_STARTEND);
 }
 
-static COW_IMPL(char[12], unum);
+static char unum[12];
 
 // Return user name or string representation of number, returned buffer
 // lasts until next call.
@@ -1423,7 +1422,7 @@ char *getusername(uid_t uid)
   return pw ? pw->pw_name : unum;
 }
 
-static COW_IMPL(char[12], gnum);
+static char gnum[12];
 
 // Return group name or string representation of number, returned buffer
 // lasts until next call.

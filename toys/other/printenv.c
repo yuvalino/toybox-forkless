@@ -17,13 +17,8 @@ config PRINTENV
 
 #include "toys.h"
 
-#if TOYBOX_FORKLESS
-#include "tvm.h"
-#define ENVIRON tvm_environ
-#else
 extern char **environ;
 #define ENVIRON environ
-#endif
 
 void printenv_main(void)
 {

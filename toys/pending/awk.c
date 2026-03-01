@@ -1222,7 +1222,7 @@ static int find_or_add_var_name(void)
 
 //// END Symbol tables functions
 
-static COW_IMPL(struct symtab_slot, locals_ent);
+static struct symtab_slot locals_ent;
 
 //// Initialization
 static void init_locals_table(void)
@@ -1231,8 +1231,8 @@ static void init_locals_table(void)
   zlist_append(&TT.locals_table, &locals_ent);
 }
 
-static COW_IMPL(struct symtab_slot, global_ent);
-static COW_IMPL(struct functab_slot, func_ent);
+static struct symtab_slot global_ent;
+static struct functab_slot func_ent;
 
 static void init_tables(void)
 {
