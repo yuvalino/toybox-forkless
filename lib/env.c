@@ -4,8 +4,6 @@
 
 // In libc, populated by start code, used by getenv() and exec() and friends.
 extern char **environ;
-#define ENVIRON environ
-
 
 // Returns the number of bytes taken by the environment variables. For use
 // when calculating the maximum bytes of environment+argument data that can
@@ -15,7 +13,7 @@ long environ_bytes(void)
   long bytes = sizeof(char *);
   char **ev;
 
-  for (ev = ENVIRON; *ev; ev++) bytes += sizeof(char *) + strlen(*ev) + 1;
+  for (ev = environ; *ev; ev++) bytes += sizeof(char *) + strlen(*ev) + 1;
 
   return bytes;
 }
@@ -27,10 +25,10 @@ void xclearenv(void)
   if (toys.envc) {
     int i;
 
-    for (i = 0; ENVIRON[i]; i++) if (i>=toys.envc) free(ENVIRON[i]);
-  } else ENVIRON = xmalloc(256*sizeof(char *));
+    for (i = 0; environ[i]; i++) if (i>=toys.envc) free(environ[i]);
+  } else environ = xmalloc(256*sizeof(char *));
   toys.envc = 1;
-  *ENVIRON = 0;
+  *environ = 0;
 }
 
 // Frees entries we set earlier. Use with libc getenv but not setenv/putenv.
@@ -46,10 +44,10 @@ char *xsetenv(char *name, char *val)
   if (!toys.envc) {
 
     // envc is size +1 so even if env empty it's nonzero after initialization
-    while (ENVIRON[toys.envc++]);
-    memcpy(new = xmalloc(((toys.envc|31)+1)*sizeof(char *)), ENVIRON,
+    while (environ[toys.envc++]);
+    memcpy(new = xmalloc(((toys.envc|31)+1)*sizeof(char *)), environ,
       toys.envc*sizeof(char *));
-    ENVIRON = (void *)new;
+    environ = (void *)new;
   }
 
   if (!(new = strchr(name, '='))) {
@@ -61,28 +59,28 @@ char *xsetenv(char *name, char *val)
     new = name;
   }
 
-  for (i = 0; ENVIRON[i]; i++) {
+  for (i = 0; environ[i]; i++) {
     // Drop old entry, freeing as appropriate. Assumes no duplicates.
-    if (!smemcmp(name, ENVIRON[i], len) && ENVIRON[i][len]=='=') {
+    if (!smemcmp(name, environ[i], len) && environ[i][len]=='=') {
       if (i<toys.envc-1) toys.envc--;
-      else free(ENVIRON[i]);
+      else free(environ[i]);
       j++;
     }
 
     // move data down to fill hole, including null terminator
-    if (j && !(ENVIRON[i] = ENVIRON[i+1])) break;
+    if (j && !(environ[i] = environ[i+1])) break;
   }
 
   if (!new) return 0;
 
   // resize and null terminate if expanding
-  if (!j && !ENVIRON[i]) {
+  if (!j && !environ[i]) {
     len = i+1;
-    if (!(len&31)) ENVIRON = xrealloc(ENVIRON, (len+32)*sizeof(char *));
-    ENVIRON[len] = 0;
+    if (!(len&31)) environ = xrealloc(environ, (len+32)*sizeof(char *));
+    environ[len] = 0;
   }
 
-  return ENVIRON[i] = new;
+  return environ[i] = new;
 }
 
 void xunsetenv(char *name)
@@ -98,15 +96,15 @@ char *xpop_env(char *name)
   char *s = 0;
 
   for (len = 0; name[len] && name[len]!='='; len++);
-  for (i = 0; ENVIRON[i]; i++) {
-    if (!s && !strncmp(name, ENVIRON[i], len) && ENVIRON[i][len] == '=') {
-      s = ENVIRON[i];
+  for (i = 0; environ[i]; i++) {
+    if (!s && !strncmp(name, environ[i], len) && environ[i][len] == '=') {
+      s = environ[i];
       if (toys.envc-1>i) {
         s = xstrdup(s);
         toys.envc--;
       }
     }
-    if (s) ENVIRON[i] = ENVIRON[i+1];
+    if (s) environ[i] = environ[i+1];
   }
 
   return s;
@@ -132,7 +130,7 @@ void reset_env(struct passwd *p, int clear)
     char **ev1, **ev2;
 
     // remove LD_*, IFS, ENV, and BASH_ENV from environment
-    for (ev1 = ev2 = ENVIRON;;) {
+    for (ev1 = ev2 = environ;;) {
       while (*ev2 && (strstart(ev2, "LD_") || strstart(ev2, "IFS=") ||
         strstart(ev2, "ENV=") || strstart(ev2, "BASH_ENV="))) ev2++;
       if (!(*ev1++ = *ev2++)) break;

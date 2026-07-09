@@ -1222,20 +1222,19 @@ static int find_or_add_var_name(void)
 
 //// END Symbol tables functions
 
-static struct symtab_slot locals_ent;
-
 //// Initialization
 static void init_locals_table(void)
 {
+  static struct symtab_slot locals_ent;
   zlist_init(&TT.locals_table, sizeof(struct symtab_slot));
   zlist_append(&TT.locals_table, &locals_ent);
 }
 
-static struct symtab_slot global_ent;
-static struct functab_slot func_ent;
-
 static void init_tables(void)
 {
+  static struct symtab_slot global_ent;
+  static struct functab_slot func_ent;
+
   // Append dummy elements in lists to force valid offsets nonzero.
   zlist_init(&TT.globals_table, sizeof(struct symtab_slot));
   zlist_append(&TT.globals_table, &global_ent);

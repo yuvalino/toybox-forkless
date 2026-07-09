@@ -17,9 +17,6 @@ config PRINTENV
 
 #include "toys.h"
 
-extern char **environ;
-#define ENVIRON environ
-
 void printenv_main(void)
 {
   char **env, **var = toys.optargs;
@@ -30,7 +27,7 @@ void printenv_main(void)
   do {
     int catch = 0, len = *var ? strlen(*var) : 0;
 
-    for (env = ENVIRON; *env; env++) {
+    for (env = environ; *env; env++) {
       char *out = *env;
       if (*var) {
         if (!strncmp(out, *var, len) && out[len] == '=') out += len +1;

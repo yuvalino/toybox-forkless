@@ -1298,8 +1298,6 @@ char *next_printf(char *s, char **start)
   return 0;
 }
 
-static struct pwuidbuf_list *pwuidbuf;
-
 // Return cached passwd entries.
 struct passwd *bufgetpwnamuid(char *name, uid_t uid)
 {
@@ -1308,6 +1306,7 @@ struct passwd *bufgetpwnamuid(char *name, uid_t uid)
     struct passwd pw;
   } *list = 0;
   struct passwd *temp;
+  static struct pwuidbuf_list *pwuidbuf;
   unsigned size = 256;
 
   // If we already have this one, return it.
@@ -1340,8 +1339,6 @@ struct passwd *bufgetpwuid(uid_t uid)
   return bufgetpwnamuid(0, uid);
 }
 
-static struct grgidbuf_list *grgidbuf;
-
 // Return cached group entries.
 struct group *bufgetgrnamgid(char *name, gid_t gid)
 {
@@ -1350,6 +1347,7 @@ struct group *bufgetgrnamgid(char *name, gid_t gid)
     struct group gr;
   } *list = 0;
   struct group *temp;
+  static struct grgidbuf_list *grgidbuf;
   unsigned size = 256;
 
   for (list = grgidbuf; list; list = list->next)
@@ -1410,25 +1408,23 @@ int regexec0(regex_t *preg, char *string, long len, int nmatch,
   return regexec(preg, string, nmatch, pmatch, eflags|REG_STARTEND);
 }
 
-static char unum[12];
-
 // Return user name or string representation of number, returned buffer
 // lasts until next call.
 char *getusername(uid_t uid)
 {
   struct passwd *pw = bufgetpwuid(uid);
+  static char unum[12];
 
   sprintf(unum, "%u", (unsigned)uid);
   return pw ? pw->pw_name : unum;
 }
-
-static char gnum[12];
 
 // Return group name or string representation of number, returned buffer
 // lasts until next call.
 char *getgroupname(gid_t gid)
 {
   struct group *gr = bufgetgrgid(gid);
+  static char gnum[12];
 
   sprintf(gnum, "%u", (unsigned)gid);
   return gr ? gr->gr_name : gnum;
