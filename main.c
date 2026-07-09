@@ -18,7 +18,6 @@ struct toy_list toy_list[] = {
 };
 
 // global context for this command.
-
 struct toy_context toys;
 union global_union this;
 char *toybox_version = TOYBOX_VERSION, toybuf[4096], libbuf[4096];
